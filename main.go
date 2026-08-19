@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,12 +24,18 @@ func main() {
 }
 
 func run(ctx context.Context, cancel context.CancelFunc, httpPort int, dataDir string) int {
-	st, err := store.New(dataDir)
+	logFile := os.Getenv("LINKO_LOG_FILE")
+	logger, err := initializeLogger(logFile)
 	if err != nil {
-		log.Printf("failed to create store: %v", err)
 		return 1
 	}
-	s := newServer(*st, httpPort, cancel)
+
+	st, err := store.New(logger, dataDir)
+	if err != nil {
+		logger.Printf("failed to create store: %v", err)
+		return 1
+	}
+	s := newServer(logger, *st, httpPort, cancel)
 	var serverErr error
 	go func() {
 		serverErr = s.start()
@@ -41,11 +46,11 @@ func run(ctx context.Context, cancel context.CancelFunc, httpPort int, dataDir s
 	defer cancel()
 
 	if err := s.shutdown(shutdownCtx); err != nil {
-		log.Printf("failed to shutdown server: %v", err)
+		logger.Printf("failed to shutdown server: %v", err)
 		return 1
 	}
 	if serverErr != nil {
-		log.Printf("server error: %v", serverErr)
+		logger.Printf("server error: %v", serverErr)
 		return 1
 	}
 	return 0
