@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
+	"fmt"
 
 	"boot.dev/linko/internal/store"
 )
@@ -43,17 +44,25 @@ func newServer(store store.Store, port int, cancel context.CancelFunc) *server {
 }
 
 func (s *server) start() error {
+	
 	ln, err := net.Listen("tcp", s.httpServer.Addr)
 	if err != nil {
 		return err
 	}
+	value, ok := ln.Addr().(*net.TCPAddr)
+	if !ok {
+		return errors.New("error: could not assert listener to TCPaddr")
+	}
+	log.Printf("Linko is running on http://localhost:%d\n", value.Port)
 	if err := s.httpServer.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+
 	return nil
 }
 
 func (s *server) shutdown(ctx context.Context) error {
+	log.Println("Linko is shutting down")
 	return s.httpServer.Shutdown(ctx)
 }
 
