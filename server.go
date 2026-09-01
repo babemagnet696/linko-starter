@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -16,10 +16,10 @@ type server struct {
 	httpServer *http.Server
 	store      store.Store
 	cancel     context.CancelFunc
-	logger     *log.Logger
+	logger     *slog.Logger
 }
 
-func newServer(logger *log.Logger, store store.Store, port int, cancel context.CancelFunc) *server {
+func newServer(logger *slog.Logger, store store.Store, port int, cancel context.CancelFunc) *server {
 	mux := http.NewServeMux()
 
 	srv := &http.Server{
@@ -55,7 +55,7 @@ func (s *server) start() error {
 	if !ok {
 		return errors.New("error: could not assert listener to TCPaddr")
 	}
-	s.logger.Printf("Linko is running on http://localhost:%d\n", value.Port)
+	s.logger.Info(fmt.Sprintf("Linko is running on http://localhost:%d\n", value.Port))
 	if err := s.httpServer.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
@@ -64,7 +64,7 @@ func (s *server) start() error {
 }
 
 func (s *server) shutdown(ctx context.Context) error {
-	s.logger.Println("Linko is shutting down")
+	s.logger.Info("Linko is shutting down")
 	return s.httpServer.Shutdown(ctx)
 }
 

@@ -3,14 +3,14 @@ package main
 import (
 	"bufio"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 )
 
 type closeFunc func() error
 
-func initializeLogger(logFile string) (*log.Logger, closeFunc, error) {
-	logger := log.New(os.Stderr, "", log.LstdFlags)
+func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	if logFile == "" {
 		return logger, func()error{return nil}, nil
 	}
@@ -22,7 +22,7 @@ func initializeLogger(logFile string) (*log.Logger, closeFunc, error) {
 	
 	bufferedFile := bufio.NewWriterSize(file, 8192)
 	multiWriter := io.MultiWriter(os.Stderr, bufferedFile)
-	logger = log.New(multiWriter, "", log.LstdFlags)
+	logger = slog.New(slog.NewTextHandler(multiWriter, nil))
 	return logger, func()error{
 		defer file.Close()
 		err := bufferedFile.Flush()
