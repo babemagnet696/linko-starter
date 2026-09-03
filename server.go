@@ -55,7 +55,10 @@ func (s *server) start() error {
 	if !ok {
 		return errors.New("error: could not assert listener to TCPaddr")
 	}
-	s.logger.Debug(fmt.Sprintf("Linko is running on http://localhost:%d\n", value.Port))
+	s.logger.Debug("Linko is running",
+		"url", "http://localhost",
+		"port", value.Port,
+	)
 	if err := s.httpServer.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
