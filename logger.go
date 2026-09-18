@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/lmittmann/tint"
+	"gopkg.in/natefinch/lumberjack.v2"
+	isatty "github.com/mattn/go-isatty"
 	pkgerr "github.com/pkg/errors"
 
 	"boot.dev/linko/internal/build"
@@ -21,10 +23,14 @@ type stackTracer interface {
 }
 
 func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
-	debugHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+	var handlers []slog.Handler
+	debugHandler := tint.NewTextHandler(os.Stderr, &tint.Options{
 		Level:       slog.LevelDebug,
 		ReplaceAttr: replaceAttr,
+		NoColor:     !(isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd())),
 	})
+	handlers = append(handlers, debugHandler)
+
 	env := os.Getenv("ENV")
 	hostname, _ := os.Hostname()
 
@@ -39,20 +45,21 @@ func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
 		return logger, func() error { return nil }, nil
 	}
 
-	file, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o644)
-	if err != nil {
-		return nil, nil, err
+	infoHandler := &lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    1,
+		MaxAge:     28,
+		MaxBackups: 10,
+		LocalTime:  false,
+		Compress:   true,
 	}
-
-	bufferedFile := bufio.NewWriterSize(file, 8192)
-	infoHandler := slog.NewJSONHandler(bufferedFile, &slog.HandlerOptions{
-		Level:       slog.LevelInfo,
+	handlers = append(handlers, slog.NewJSONHandler(infoHandler, &slog.HandlerOptions{
 		ReplaceAttr: replaceAttr,
-	})
+		Level: slog.LevelInfo,
+	}))
 
 	logger = slog.New(slog.NewMultiHandler(
-		debugHandler,
-		infoHandler,
+		handlers...,
 	))
 	logger = logger.With(
 		slog.String("git_sha", build.GitSHA),
@@ -61,9 +68,9 @@ func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
 		slog.String("hostname", hostname),
 	)
 	return logger, func() error {
-		defer file.Close()
-		err := bufferedFile.Flush()
+		err := infoHandler.Close()
 		if err != nil {
+			fmt.Printf("error closing logger file: %w", err)
 			return err
 		}
 		return nil

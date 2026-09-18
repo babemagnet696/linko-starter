@@ -21,10 +21,12 @@ func requestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 			r.Body = spyReader
 
 			next.ServeHTTP(spyWriter, r)
+			reqID := spyWriter.ResponseWriter.Header().Get("X-Request-ID")
 			info = append(info, 
-				slog.Attr{Key: "method",    Value: slog.StringValue(r.Method)},
-				slog.Attr{Key: "path",      Value: slog.StringValue(r.URL.Path)},
-				slog.Attr{Key: "client_ip", Value: slog.StringValue(r.RemoteAddr)},
+				slog.Attr{Key: "method",     Value: slog.StringValue(r.Method)},
+				slog.Attr{Key: "path",       Value: slog.StringValue(r.URL.Path)},
+				slog.Attr{Key: "client_ip",  Value: slog.StringValue(r.RemoteAddr)},
+				slog.Attr{Key: "request_id", Value: slog.AnyValue(reqID)},
 				slog.Duration("duration", time.Since(start)),
 				slog.Int("request_body_bytes", spyReader.bytesRead),
 				slog.Int("response_status", spyWriter.statusCode),
