@@ -9,8 +9,8 @@ import (
 
 	pkgerr "github.com/pkg/errors"
 
-	"boot.dev/linko/internal/linkoerr"
 	"boot.dev/linko/internal/build"
+	"boot.dev/linko/internal/linkoerr"
 )
 
 type closeFunc func() error
@@ -98,15 +98,15 @@ type multiError interface {
 }
 
 func errorAttrs(err error) []slog.Attr {
-    attrs := []slog.Attr{
-        slog.String("message", err.Error()),
-    }
-    if stackErr, ok := errors.AsType[stackTracer](err); ok {
-        attrs = append(attrs, slog.Attr{
+	attrs := []slog.Attr{
+		slog.String("message", err.Error()),
+	}
+	if stackErr, ok := errors.AsType[stackTracer](err); ok {
+		attrs = append(attrs, slog.Attr{
 			Key:   "stack_trace",
 			Value: slog.StringValue(fmt.Sprintf("%+v", stackErr.StackTrace())),
 		})
-    }
-    attrs = append(attrs, linkoerr.Attrs(err)...)
-    return attrs
+	}
+	attrs = append(attrs, linkoerr.Attrs(err)...)
+	return attrs
 }
