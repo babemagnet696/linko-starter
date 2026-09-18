@@ -33,15 +33,24 @@ func requestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 			if logContext.Username != "" {
 				info = append(info, slog.Attr{Key: "user", Value: slog.StringValue(logContext.Username)})
 			}
+			if logContext.Error != nil {
+				info = append(info, slog.Attr{Key: "error", Value: slog.AnyValue(logContext.Error)})
+			}
 			logger.Info("Served request", info...)
 		})
 	}
 }
 
-
+func httpError(ctx context.Context, w http.ResponseWriter, status int, err error) {
+	if logCtx, ok := ctx.Value(logCtxKey).(*LogCtx); ok {
+		logCtx.Error = err
+	}
+	http.Error(w, err.Error(), status)
+}
 
 type LogCtx struct {
 	Username string
+	Error    error
 }
 
 const logCtxKey contextKey = "log_context"
