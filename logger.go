@@ -10,6 +10,7 @@ import (
 	pkgerr "github.com/pkg/errors"
 
 	"boot.dev/linko/internal/linkoerr"
+	"boot.dev/linko/internal/build"
 )
 
 type closeFunc func() error
@@ -24,8 +25,17 @@ func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
 		Level:       slog.LevelDebug,
 		ReplaceAttr: replaceAttr,
 	})
+	env := os.Getenv("ENV")
+	hostname, _ := os.Hostname()
+
 	logger := slog.New(debugHandler)
 	if logFile == "" {
+		logger = logger.With(
+			slog.String("git_sha", build.GitSHA),
+			slog.String("build_time", build.BuildTime),
+			slog.String("env", env),
+			slog.String("hostname", hostname),
+		)
 		return logger, func() error { return nil }, nil
 	}
 
@@ -44,6 +54,12 @@ func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
 		debugHandler,
 		infoHandler,
 	))
+	logger = logger.With(
+		slog.String("git_sha", build.GitSHA),
+		slog.String("build_time", build.BuildTime),
+		slog.String("env", env),
+		slog.String("hostname", hostname),
+	)
 	return logger, func() error {
 		defer file.Close()
 		err := bufferedFile.Flush()
