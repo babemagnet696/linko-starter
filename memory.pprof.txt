@@ -1,0 +1,40 @@
+File: linko
+Build ID: f7039aff683c2e630f053e71e6ea3f12ba2a2ce7
+Type: inuse_space
+Time: 2026-09-24 11:05:59 EDT
+Duration: 29.15s, Total samples = 4588.91kB 
+Showing nodes accounting for 1727.41kB, 37.64% of 4588.91kB total
+      flat  flat%   sum%        cum   cum%
+ 2613.49kB 56.95% 56.95%  2613.49kB 56.95%  internal/bytealg.MakeNoZero
+ -902.59kB 19.67% 37.28%  -357.92kB  7.80%  compress/flate.NewWriter (inline)
+  544.67kB 11.87% 49.15%   544.67kB 11.87%  compress/flate.(*compressor).initDeflate (inline)
+ -528.17kB 11.51% 37.64%  -528.17kB 11.51%  regexp.(*bitState).reset
+         0     0% 37.64%  -357.92kB  7.80%  bufio.(*Writer).Flush
+         0     0% 37.64%   544.67kB 11.87%  compress/flate.(*compressor).init
+         0     0% 37.64%  -357.92kB  7.80%  compress/gzip.(*Writer).Write
+         0     0% 37.64%  -528.17kB 11.51%  github.com/prometheus/client_golang/prometheus.(*Registry).Gather.func1
+         0     0% 37.64%  -528.17kB 11.51%  github.com/prometheus/client_golang/prometheus.(*processCollector).Collect
+         0     0% 37.64%  -528.17kB 11.51%  github.com/prometheus/client_golang/prometheus.(*processCollector).processCollect
+         0     0% 37.64%  -528.17kB 11.51%  github.com/prometheus/client_golang/prometheus.safeCollect
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/client_golang/prometheus/promhttp.HandlerForTransactional.func1
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerCounter.func1
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/client_golang/prometheus/promhttp.InstrumentMetricHandler.InstrumentHandlerInFlight.func1
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/common/expfmt.MetricFamilyToText
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/common/expfmt.MetricFamilyToText.func1
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/common/expfmt.NewEncoder.func7
+         0     0% 37.64%  -357.92kB  7.80%  github.com/prometheus/common/expfmt.encoderCloser.Encode
+         0     0% 37.64%  -528.17kB 11.51%  github.com/prometheus/procfs.Proc.Limits
+         0     0% 37.64%  2613.49kB 56.95%  main.(*server).handlerRedirect
+         0     0% 37.64%  2255.57kB 49.15%  main.newServer.metricsMiddleware.func5
+         0     0% 37.64%  2255.57kB 49.15%  main.newServer.newServer.requestID.func1.func4
+         0     0% 37.64%  2255.57kB 49.15%  main.newServer.newServer.requestLogger.func2.func3
+         0     0% 37.64%  2255.57kB 49.15%  net/http.(*ServeMux).ServeHTTP
+         0     0% 37.64%  2255.57kB 49.15%  net/http.(*conn).serve
+         0     0% 37.64%  2255.57kB 49.15%  net/http.HandlerFunc.ServeHTTP
+         0     0% 37.64%  2255.57kB 49.15%  net/http.serverHandler.ServeHTTP
+         0     0% 37.64%  -528.17kB 11.51%  regexp.(*Regexp).FindStringSubmatch
+         0     0% 37.64%  -528.17kB 11.51%  regexp.(*Regexp).backtrack
+         0     0% 37.64%  -528.17kB 11.51%  regexp.(*Regexp).doExecute
+         0     0% 37.64%  2613.49kB 56.95%  strings.(*Builder).Grow
+         0     0% 37.64%  2613.49kB 56.95%  strings.(*Builder).grow
+         0     0% 37.64%  2613.49kB 56.95%  strings.Repeat

@@ -1,0 +1,32 @@
+File: linko
+Build ID: f7039aff683c2e630f053e71e6ea3f12ba2a2ce7
+Type: cpu
+Time: 2026-09-24 10:59:29 EDT
+Duration: 30s, Total samples = 9.29s (30.96%)
+Showing nodes accounting for 9.15s, 98.49% of 9.29s total
+Dropped 115 nodes (cum <= 0.05s)
+      flat  flat%   sum%        cum   cum%
+     8.83s 95.05% 95.05%      8.86s 95.37%  golang.org/x/crypto/blowfish.encryptBlock
+     0.19s  2.05% 97.09%      9.05s 97.42%  golang.org/x/crypto/blowfish.ExpandKey
+     0.08s  0.86% 97.95%      0.08s  0.86%  internal/runtime/syscall/linux.Syscall6
+     0.05s  0.54% 98.49%      0.05s  0.54%  runtime.futex
+         0     0% 98.49%      0.05s  0.54%  bufio.(*Writer).Flush
+         0     0% 98.49%      9.05s 97.42%  golang.org/x/crypto/bcrypt.GenerateFromPassword
+         0     0% 98.49%      9.05s 97.42%  golang.org/x/crypto/bcrypt.bcrypt
+         0     0% 98.49%      9.05s 97.42%  golang.org/x/crypto/bcrypt.expensiveBlowfishSetup
+         0     0% 98.49%      9.05s 97.42%  golang.org/x/crypto/bcrypt.newFromPassword
+         0     0% 98.49%      0.05s  0.54%  internal/poll.ignoringEINTRIO (inline)
+         0     0% 98.49%      9.07s 97.63%  main.(*server).handlerRedirect
+         0     0% 98.49%      9.09s 97.85%  main.newServer.metricsMiddleware.func5
+         0     0% 98.49%      9.09s 97.85%  main.newServer.newServer.requestID.func1.func4
+         0     0% 98.49%      9.09s 97.85%  main.newServer.newServer.requestLogger.func2.func3
+         0     0% 98.49%      9.09s 97.85%  net/http.(*ServeMux).ServeHTTP
+         0     0% 98.49%      9.16s 98.60%  net/http.(*conn).serve
+         0     0% 98.49%      9.09s 97.85%  net/http.HandlerFunc.ServeHTTP
+         0     0% 98.49%      9.09s 97.85%  net/http.serverHandler.ServeHTTP
+         0     0% 98.49%      0.05s  0.54%  runtime.futexwakeup
+         0     0% 98.49%      0.05s  0.54%  runtime.notewakeup
+         0     0% 98.49%      0.05s  0.54%  runtime.startm
+         0     0% 98.49%      0.05s  0.54%  runtime.wakep
+         0     0% 98.49%      0.08s  0.86%  syscall.RawSyscall6
+         0     0% 98.49%      0.08s  0.86%  syscall.Syscall

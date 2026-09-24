@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"os"
+	"slices"
 
 	"github.com/lmittmann/tint"
-	"gopkg.in/natefinch/lumberjack.v2"
 	isatty "github.com/mattn/go-isatty"
 	pkgerr "github.com/pkg/errors"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"boot.dev/linko/internal/build"
 	"boot.dev/linko/internal/linkoerr"
@@ -77,16 +79,19 @@ func initializeLogger(logFile string) (*slog.Logger, closeFunc, error) {
 	}, nil
 }
 
+var sensitiveKeys = []string{"password", "key", "apikey", "secret", "pin", "creditcardno", "user", "username", "displayname", "name"}
+
 func replaceAttr(groups []string, a slog.Attr) slog.Attr {
 	if a.Key != "error" {
-		return a
+		return redactSensitive(a)
 	}
-
+	
 	err, ok := a.Value.Any().(error)
 	if !ok {
 		return a
 	}
-
+	
+	
 	var attrs []slog.Attr
 	if multiErr, ok := errors.AsType[multiError](err); ok {
 		for i, err := range multiErr.Unwrap() {
@@ -94,9 +99,29 @@ func replaceAttr(groups []string, a slog.Attr) slog.Attr {
 		}
 		return slog.GroupAttrs("errors", attrs...)
 	}
-
+	
 	attrs = errorAttrs(err)
 	return slog.GroupAttrs("error", attrs...)
+}
+
+func redactSensitive(a slog.Attr) slog.Attr {
+	if slices.Contains(sensitiveKeys, a.Key) {
+		return slog.String(a.Key, "[REDACTED]")
+	}
+	if a.Key == "long_url" {
+		parsed, err := url.Parse(a.Value.String())
+		if err != nil {
+			return a // TODO
+		}
+
+		if parsed.User != nil {
+			parsed.User = url.UserPassword("[REDACTED]", "[REDACTED]")
+		}
+
+		return slog.String(a.Key, parsed.String())
+	}
+
+	return a
 }
 
 type multiError interface {

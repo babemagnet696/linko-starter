@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"time"
 )
@@ -22,10 +24,11 @@ func requestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 
 			next.ServeHTTP(spyWriter, r)
 			reqID := spyWriter.ResponseWriter.Header().Get("X-Request-ID")
+
 			info = append(info, 
 				slog.Attr{Key: "method",     Value: slog.StringValue(r.Method)},
 				slog.Attr{Key: "path",       Value: slog.StringValue(r.URL.Path)},
-				slog.Attr{Key: "client_ip",  Value: slog.StringValue(r.RemoteAddr)},
+				slog.Attr{Key: "client_ip",  Value: slog.StringValue(redactIP(r.RemoteAddr))},
 				slog.Attr{Key: "request_id", Value: slog.AnyValue(reqID)},
 				slog.Duration("duration", time.Since(start)),
 				slog.Int("request_body_bytes", spyReader.bytesRead),
@@ -54,6 +57,25 @@ func httpError(ctx context.Context, w http.ResponseWriter, status int, err error
 		http.Error(w, err.Error(), status)
 	}
 	
+}
+
+func redactIP(ip string) string {
+	host, _, err := net.SplitHostPort(ip)
+	if err != nil {
+		host = ip
+	}
+
+	parsedIP := net.ParseIP(host)
+	if parsedIP == nil {
+		return ip
+	}
+	ipv4 := parsedIP.To4()
+	if ipv4== nil {
+		return ip
+	}
+
+	redacted := fmt.Sprintf("%d.%d.%d.x", ipv4[0], ipv4[1], ipv4[2])
+	return redacted
 }
 
 type LogCtx struct {
